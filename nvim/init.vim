@@ -3,39 +3,34 @@ filetype off                  " required
 
 call plug#begin('~/.local/share/nvim/plugged')
 
-Plug 'quabug/vim-gdscript'
 Plug 'scrooloose/nerdtree'
 Plug 'ryanoasis/vim-devicons'
 Plug 'kien/ctrlp.vim'
-Plug 'vim-ruby/vim-ruby'
-Plug 'ekalinin/Dockerfile.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'jparise/vim-graphql'
-Plug 'pangloss/vim-javascript'
 Plug 'ap/vim-css-color'
-Plug 'mxw/vim-jsx'
-Plug 'flowtype/vim-flow'
 Plug 'w0rp/ale'
-Plug 'moll/vim-node'
-Plug 'posva/vim-vue'
 Plug 'dart-lang/dart-vim-plugin'
-
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-
+Plug 'leafgarland/typescript-vim'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'natebosch/vim-lsc'
+Plug 'natebosch/vim-lsc-dart'
 Plug 'ervandew/supertab'
 Plug 'keith/swift.vim'
-Plug 'kamykn/skyhawk'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-Plug 'drewtempelmeyer/palenight.vim'
+" post install (yarn install | npm install) then load plugin only for editing supported files
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
+
+Plug 'exitface/synthwave.vim'
+
+" skyn
+Plug 'tomasiser/vim-code-dark'
+Plug 'neoclide/coc.nvim'
 
 call plug#end()
 
@@ -47,10 +42,20 @@ set incsearch
 let g:jsx_ext_required = 0
 
 " Theme
+" set background=dark
+" color synthwave
 syntax enable
 set t_Co=256
-colorscheme skyhawk
+colorscheme codedark
 set background=dark
+
+let g:airline_theme='synthwave'
+
+if has('termguicolors')
+  set termguicolors " 24-bit terminal
+else
+  let g:synthwave_termcolors=256 " 256 color mode
+endif
 
 set encoding=utf8
 
@@ -131,6 +136,9 @@ map <C-n> :NERDTreeToggle<CR>
 au BufNewFile,BufRead *.html.erb set filetype=html
 au BufNewFile,BufRead *.js.erb set filetype=javascript
 
+" set filetypes as typescript.tsx
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescript.tsx
+
 " lua views files
 au BufNewFile,BufRead *.etlua set filetype=html
 
@@ -188,18 +196,9 @@ let g:vue_disable_pre_processors=1
 hi IndentGuidesOdd  ctermbg=black
 hi IndentGuidesEven ctermbg=darkgrey
 
-" Deoplete
-let g:deoplete#enable_at_startup = 1
 
-" Using relative path for paths autocomplete
-let g:deoplete#file#enable_buffer_path = 1
-
-" Adjusting Deoplete tab order
+" Adjusting tab order
 let g:SuperTabDefaultCompletionType = "<c-n>"
-
-" Disable deoplete for certain files
-autocmd FileType dart
-       \ call deoplete#custom#buffer_option('auto_complete', v:false)
 
 " map gf to open on a slit
 nnoremap fg <C-W>f
@@ -212,18 +211,6 @@ command VTerm vsplit term://bash
 " Relative number
 set relativenumber
 
-" |Theme
-set background=dark
-colorscheme palenight
+" keymap for vim lsc
+let g:lsc_auto_map = v:true
 
-if (has("nvim"))
-  "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
-  let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-endif
-
-"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
-"Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
-" < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
-if (has("termguicolors"))
-  set termguicolors
-endif<Paste>
