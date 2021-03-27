@@ -18,6 +18,7 @@ Plug 'ervandew/supertab'
 Plug 'keith/swift.vim'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'dracula/vim', { 'as': 'dracula' }
 
 " post install (yarn install | npm install) then load plugin only for editing supported files
 Plug 'prettier/vim-prettier', {
@@ -39,13 +40,14 @@ set incsearch
 " JSX enabled for js files
 let g:jsx_ext_required = 0
 
-" Theme
-" set background=dark
-" color synthwave
+" Theme codedark
+set background=dark
+color synthwave
 syntax enable
 set t_Co=256
-colorscheme codedark
+colorscheme dracula
 set background=dark
+
 
 let g:airline_theme='synthwave'
 
@@ -56,6 +58,7 @@ else
 endif
 
 set encoding=utf8
+let g:WebDevIconsOS = 'Darwin'
 
 set expandtab
 set tabstop=2
