@@ -8,18 +8,20 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'kien/ctrlp.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'vim-airline/vim-airline'
-Plug 'jparise/vim-graphql'
 Plug 'ap/vim-css-color'
-Plug 'w0rp/ale'
+
 Plug 'dart-lang/dart-vim-plugin'
-Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
-Plug 'ervandew/supertab'
-Plug 'keith/swift.vim'
+Plug 'natebosch/vim-lsc'
+Plug 'natebosch/vim-lsc-dart'
+
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+Plug 'leafgarland/typescript-vim'
+
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'rhysd/git-messenger.vim'
+
+" code snippet
 Plug 'hrsh7th/vim-vsnip'
 Plug 'hrsh7th/vim-vsnip-integ'
 Plug 'Neevash/awesome-flutter-snippets'
@@ -31,11 +33,51 @@ Plug 'prettier/vim-prettier', {
 
 Plug 'exitface/synthwave.vim'
 
-" skyn
-Plug 'tomasiser/vim-code-dark'
-Plug 'neoclide/coc.nvim'
-
 call plug#end()
+
+" --------------------------------------------------------
+" SETTINGS START
+
+set completeopt=longest,menuone
+
+" SETTINGS END
+" --------------------------------------------------------
+
+" --------------------------------------------------------
+" COC-VIM TAB SETTINGS START
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
+" <cr> could be remapped by other vim plugin, try `:verbose imap <CR>`.
+if exists('*complete_info')
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" COC-VIM TAB SETTINGS END
+" --------------------------------------------------------
 
 " Search highlight and searching as you type
 set hlsearch
@@ -44,15 +86,11 @@ set incsearch
 " JSX enabled for js files
 let g:jsx_ext_required = 0
 
-" Theme codedark
+" Theme
 set background=dark
 color synthwave
-syntax enable
 set t_Co=256
 colorscheme dracula
-set background=dark
-
-
 let g:airline_theme='synthwave'
 
 if has('termguicolors')
@@ -62,7 +100,6 @@ else
 endif
 
 set encoding=utf8
-let g:WebDevIconsOS = 'Darwin'
 
 set expandtab
 set tabstop=2
@@ -189,14 +226,6 @@ match ExtraWhitespace /\s\+$/
 command Horizontal windo wincmd K
 command Vertical windo wincmd H
 
-" ALE config
-let g:ale_linters = {
-\   'javascript': ['eslint'],
-\}
-
-" Vue vim disabling pre processors as it really slows down vim
-let g:vue_disable_pre_processors=1
-
 " Indent
 hi IndentGuidesOdd  ctermbg=black
 hi IndentGuidesEven ctermbg=darkgrey
@@ -216,52 +245,30 @@ command VTerm vsplit term://bash
 " Relative number
 set relativenumber
 
-" keymap for vim lsc
-let g:lsc_auto_map = v:true
+" We use coc for autocomplete
+let g:lsc_enable_autocomplete = v:false
 
+" Flutter helpers
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
 
-" inoremap <silent><expr> <TAB>
-"       \ pumvisible() ? "\<C-n>" :
-"       \ <SID>check_back_space() ? "\<TAB>" :
-"       \ coc#refresh()
-" inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-" 
-" function! s:check_back_space() abort
-"   let col = col('.') - 1
-"   return !col || getline('.')[col - 1]  =~# '\s'
-" endfunction
+command FFormat !flutter format %
+command FTest !flutter test %
+command FBuildRunner !flutter packages pub run build_runner build
+command FCoverage !flutter test --coverage && lcov --remove coverage/lcov.info '**/*.g.dart' && lcov --remove coverage/lcov.info '**/*.gen.dart' -o coverage/lcov.info && genhtml coverage/lcov.info -o coverage/html && open coverage/html/index.html
 
-inoremap <silent><expr> <c-space> coc#refresh()
+" Flutter helpers with fvm
+command FVMFormat !fvm flutter format %
+command FVMTest !fvm flutter test %
+command FVMBuildRunner !fvm flutter packages pub run build_runner build
+command FVMCoverage !fvm flutter test --coverage && lcov --remove coverage/lcov.info '**/*.g.dart' && lcov --remove coverage/lcov.info '**/*.gen.dart' -o coverage/lcov.info && genhtml coverage/lcov.info -o coverage/html && open coverage/html/index.html
 
-" CODE SNIPPET
-" NOTE: You can use other key to expand snippet.
+" LSC proxy commands
+command GoToDef :LSClientGoToDefinitionSplit
+command GoToSuper :CocCommand flutter.gotoSuper
 
-" Expand
-imap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
-smap <expr> <C-j>   vsnip#expandable()  ? '<Plug>(vsnip-expand)'         : '<C-j>'
 
-" Expand or jump
+" Code snippet config
+imap <expr> <C-j>   vsnip#available(1)  ? '<Plug>(vsnip-expand)'         : '<C-j>'
 imap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
 smap <expr> <C-l>   vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-l>'
-
-" Jump forward or backward
-imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
-imap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-smap <expr> <S-Tab> vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
-
-" Select or cut text to use as $TM_SELECTED_TEXT in the next snippet.
-" See https://github.com/hrsh7th/vim-vsnip/pull/50
-nmap        s   <Plug>(vsnip-select-text)
-xmap        s   <Plug>(vsnip-select-text)
-nmap        S   <Plug>(vsnip-cut-text)
-xmap        S   <Plug>(vsnip-cut-text)
-
-" If you want to use snippet for multiple filetypes, you can `g:vsnip_filetypes` for it.
-let g:vsnip_filetypes = {}
-let g:vsnip_filetypes.javascriptreact = ['javascript']
-let g:vsnip_filetypes.typescriptreact = ['typescript']
-
-
