@@ -15,6 +15,11 @@ In `/home/<user>/.config` create a folder `nvim`;
 
 After, copy the `init.vim` and `coc-settings.json` inside the folder.
 
-To install fonts, create a `.fonts` in `/home/<user>/`, copuy the font file inside that.
+[Linux]
+To install fonts, create a `.fonts` in `/home/<user>/`, copy the font file inside that.
+
+[Mac]
+You can install front from [nerd fonts](https://github.com/ryanoasis/nerd-fonts)
+(DroidSansMono)
 
 Rerun your terminal and Done.
