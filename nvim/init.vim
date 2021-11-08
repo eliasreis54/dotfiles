@@ -265,6 +265,7 @@ command FVMCoverage !fvm flutter test --coverage && lcov --remove coverage/lcov.
 
 " LSC proxy commands
 command GoToDef :LSClientGoToDefinitionSplit
+command FindRef :LSClientFindReferences
 command GoToSuper :CocCommand flutter.gotoSuper
 
 
